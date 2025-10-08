@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Confirmation de commande</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <section class="confirmation">
+      <h1>Commande confirmée ✅</h1>
+      <p><strong>Nom :</strong> Master</p>
+      <p><strong>Prénom :</strong> CCA</p>
+      <p><strong>Adresse :</strong> rue de l’Observatoire, 25000 Besançon</p>
+      <p><strong>Produit :</strong> Blender 4 Magimix</p>
+      <p class="thanks">Merci de votre commande !<br>Vous recevrez un récapitulatif par mail sous peu.</p>
+
+      <button class="btn btn-primary" onclick="window.location.href='index.html'">Retour à l'accueil</button>
+    </section>
+  </main>
+</body>
+</html>
