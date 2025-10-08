@@ -1,0 +1,152 @@
+/* script.js — gestion du panier, code promo et redirection vers confirmation */
+
+/* ===== UTILITAIRES ===== */
+function formatPrice(value) {
+  const fixed = (Math.round(value * 100) / 100).toFixed(2);
+  return fixed.replace('.', ',') + ' €';
+}
+
+function getCart() {
+  try {
+    const raw = localStorage.getItem('panier');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(cart) {
+  localStorage.setItem('panier', JSON.stringify(cart));
+  updateCartCount();
+}
+
+/* ===== PANIER ===== */
+function addToCart(product) {
+  const cart = getCart();
+  const idx = cart.findIndex(it => it.id === product.id);
+  if (idx >= 0) {
+    cart[idx].qty += 1;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      qty: 1,
+      image: product.image || ''
+    });
+  }
+  saveCart(cart);
+}
+
+function removeFromCart(id) {
+  let cart = getCart().filter(it => it.id !== id);
+  saveCart(cart);
+  renderCartPage();
+}
+
+function clearCart() {
+  localStorage.removeItem('panier');
+  localStorage.removeItem('promoCode');
+  updateCartCount();
+}
+
+function updateCartCount() {
+  const cart = getCart();
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = count;
+}
+
+/* ===== CODE PROMO ===== */
+function calculateSubtotal(cart) {
+  return cart.reduce((s, i) => s + i.price * i.qty, 0);
+}
+
+function computePromo(cart, code) {
+  const subtotal = calculateSubtotal(cart);
+  if (!code) return { valid: false, discount: 0, total: subtotal, msg: 'Aucun code appliqué' };
+  if (code.toUpperCase() === 'CCA15') {
+    const discount = subtotal * 0.15;
+    return { valid: true, discount, total: subtotal - discount, msg: 'Code CCA15 appliqué (-15%)' };
+  }
+  return { valid: false, discount: 0, total: subtotal, msg: 'Code invalide' };
+}
+
+function applyPromo(code) {
+  const cart = getCart();
+  if (!cart.length) {
+    showPromoMessage('Panier vide', false);
+    return;
+  }
+  const result = computePromo(cart, code);
+  if (result.valid) {
+    localStorage.setItem('promoCode', code.toUpperCase());
+    showPromoMessage(result.msg, true);
+  } else {
+    localStorage.removeItem('promoCode');
+    showPromoMessage(result.msg, false);
+  }
+  renderCartPage();
+}
+
+function showPromoMessage(text, success) {
+  const el = document.getElementById('promo-message');
+  if (el) {
+    el.textContent = text;
+    el.style.color = success ? '#0b6b4f' : '#c21c1c';
+  }
+}
+
+/* ===== AFFICHAGE DU PANIER ===== */
+function renderCartPage() {
+  const cart = getCart();
+  const container = document.getElementById('cart-container');
+  const subtotalEl = document.getElementById('subtotal');
+  const totalEl = document.getElementById('total');
+
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (!cart.length) {
+    container.innerHTML = '<p>Votre panier est vide.</p>';
+    subtotalEl.textContent = '0,00 €';
+    totalEl.textContent = '0,00 €';
+    return;
+  }
+
+  cart.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'cart-item';
+    el.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <div class="item-details">
+        <div class="item-title">${item.name}</div>
+        <div class="item-price">${formatPrice(item.price)}</div>
+        <div class="item-qty">Quantité : ${item.qty}</div>
+        <button class="btn btn-outline" onclick="removeFromCart('${item.id}')">Retirer</button>
+      </div>
+    `;
+    container.appendChild(el);
+  });
+
+  const subtotal = calculateSubtotal(cart);
+  subtotalEl.textContent = formatPrice(subtotal);
+
+  const promo = (localStorage.getItem('promoCode') || '').trim();
+  if (promo) {
+    const res = computePromo(cart, promo);
+    totalEl.textContent = formatPrice(res.total);
+    showPromoMessage(res.msg, res.valid);
+  } else {
+    totalEl.textContent = formatPrice(subtotal);
+    showPromoMessage('', false);
+  }
+}
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', updateCartCount);
+window.addToCart = addToCart;
+window.updateCartCount = updateCartCount;
+window.renderCartPage = renderCartPage;
+window.applyPromo = applyPromo;
+window.formatPrice = formatPrice;
