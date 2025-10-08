@@ -1,24 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magimix - Page d'accueil</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blender Power Magimix — Produit</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Bienvenue sur Magimix</h1>
-    </header>
-    <main>
-        <h2>Nos Produits</h2>
-        <div class="produits">
-            <!-- Produits à afficher ici -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="#">MAGIMIX • clone</a>
+      <div class="cart-actions">
+        <button id="view-cart-btn" class="btn btn-outline">Voir le panier (<span id="cart-count">0</span>)</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container product-page">
+    <section class="product-card">
+      <div class="product-media">
+        <img id="product-image" 
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAAMgCAIAAABUEpE/AAA..." 
+        alt="Blender Power Magimix">
+      </div>
+
+      <div class="product-info">
+        <h1 id="product-title">Blender Power Magimix</h1>
+
+        <div class="price-block">
+          <div class="price-old" aria-hidden="true">249,00 €</div>
+          <div class="price-current" id="product-price">199,00 €</div>
         </div>
-    </main>
-    <footer>
-        <p>&copy; 2023 Magimix</p>
-    </footer>
-    <script src="script.js"></script>
+
+        <ul class="product-features">
+          <li>Moteur puissant pour smoothies et soupes</li>
+          <li>Bol en verre robuste</li>
+          <li>Design élégant et durable</li>
+          <li>Couleur : blanc</li>
+        </ul>
+
+        <div class="product-actions">
+          <button id="add-to-cart-btn" class="btn btn-primary">Ajouter au panier</button>
+          <button id="view-cart-btn-2" class="btn btn-outline">Voir le panier</button>
+        </div>
+
+        <p class="small-note">
+          Code promo : <strong>CCA15</strong> → -15% (à appliquer dans le panier)
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>Exemple pédagogique — clone visuel pour test.</small>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    const PRODUCT = {
+      id: "magimix-blender-power-001",
+      name: "Blender Power Magimix",
+      price: 199.00,
+      oldPrice: 249.00,
+      image: document.getElementById('product-image').src
+    };
+
+    document.getElementById('product-title').textContent = PRODUCT.name;
+    document.getElementById('product-price').textContent = formatPrice(PRODUCT.price);
+    document.querySelector('.price-old').textContent = formatPrice(PRODUCT.oldPrice);
+
+    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+      addToCart(PRODUCT);
+      flashAdded();
+    });
+
+    document.getElementById('view-cart-btn').addEventListener('click', () => {
+      window.location.href = 'panier.html';
+    });
+    document.getElementById('view-cart-btn-2').addEventListener('click', () => {
+      window.location.href = 'panier.html';
+    });
+
+    updateCartCount();
+
+    function flashAdded() {
+      const btn = document.getElementById('add-to-cart-btn');
+      btn.textContent = 'Ajouté ✓';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = 'Ajouter au panier';
+        btn.disabled = false;
+      }, 900);
+    }
+  </script>
 </body>
 </html>
